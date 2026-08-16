@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Guest</title>
+  </head>
+
+  <body>
+    <h1>Add Guest</h1>
+
+    <form action="{% url 'add_guest' %}" method="post">
+      {% csrf_token %}
+
+      <div class="container">
+        <label for="name"><b>Name</b></label>
+        <input
+          type="text"
+          placeholder="Enter Guest Name"
+          name="name"
+          required
+        />
+
+        <br /><br />
+
+        <label for="mobile_number"><b>Mobile Number</b></label>
+        <input
+          type="tel"
+          placeholder="Enter Mobile Number"
+          name="mobile_number"
+          required
+        />
+
+        <br /><br />
+
+        <label for="p_address"><b>Address</b></label>
+        <textarea
+          placeholder="Enter Permanent Address"
+          name="p_address"
+          required
+        ></textarea>
+
+        <br /><br />
+
+        <label for="aadhar_ID"><b>Aadhar ID</b></label>
+        <input
+          type="text"
+          placeholder="Enter Aadhar ID"
+          name="aadhar_ID"
+          maxlength="12"
+          required
+        />
+
+        <br /><br />
+
+        <button type="submit">Add Guest</button>
+      </div>
+    </form>
+  </body>
+</html>
