@@ -69,10 +69,17 @@ def add_room(request):
 
     if request.method == "POST":
 
+        room_number = request.POST['room_number']
         is_available = 'is_available' in request.POST
 
+        if Room.objects.filter(room_number=room_number).exists():
+            return render(request, 'add_room.html', {
+                'room_numbers': room_numbers,
+                'error': 'This room has already been added.'
+            })
+
         Room.objects.create(
-            room_number=request.POST['room_number'],
+            room_number=room_number,
             is_available=is_available
         )
 
@@ -82,7 +89,6 @@ def add_room(request):
         'room_numbers': room_numbers
     })
 
-
 def add_booking(request):
 
     if request.method == "POST":
@@ -90,10 +96,6 @@ def add_booking(request):
         check_in = request.POST['check_in']
         check_out = request.POST['check_out']
 
-        # Get today's date
-        today = timezone.localdate()
-
-        # Convert strings from HTML into actual dates
         from datetime import datetime
 
         check_in_date = datetime.strptime(
@@ -104,7 +106,8 @@ def add_booking(request):
             check_out, '%Y-%m-%d'
         ).date()
 
-        # Don't allow check-in in the past
+        today = timezone.localdate()
+
         if check_in_date < today:
             return render(request, 'add_booking.html', {
                 'error': 'Check-in date cannot be in the past.',
@@ -112,7 +115,7 @@ def add_booking(request):
                 'rooms': Room.objects.filter(is_available=True)
             })
 
-        # Don't allow check-out in the past
+        
         if check_out_date < today:
             return render(request, 'add_booking.html', {
                 'error': 'Check-out date cannot be in the past.',
@@ -120,7 +123,7 @@ def add_booking(request):
                 'rooms': Room.objects.filter(is_available=True)
             })
 
-        # Check-out should not be before check-in
+        
         if check_out_date < check_in_date:
             return render(request, 'add_booking.html', {
                 'error': 'Check-out date cannot be before check-in date.',
@@ -135,6 +138,20 @@ def add_booking(request):
         room = Room.objects.get(
             id=request.POST['room']
         )
+
+        
+        overlapping_booking = Booking.objects.filter(
+            room_number=room,
+            check_in__lt=check_out_date,
+            check_out__gt=check_in_date
+        ).exists()
+
+        if overlapping_booking:
+            return render(request, 'add_booking.html', {
+                'error': 'This room is already booked for the selected dates.',
+                'guests': Guests.objects.all(),
+                'rooms': Room.objects.filter(is_available=True)
+            })
 
         Booking.objects.create(
             guest=guest,
@@ -153,6 +170,7 @@ def add_booking(request):
         'rooms': rooms
     })
 
+
 def booking(request):
 
     all_bookings = Booking.objects.all()
@@ -160,3 +178,10 @@ def booking(request):
     return render(request, 'bookings.html', {
         'bookings': all_bookings
     })
+
+def delete_booking(request, booking_id):
+    if request.method == "POST":
+        booking = Booking.objects.get(id=booking_id)
+        booking.delete()
+
+    return redirect('/booking/')

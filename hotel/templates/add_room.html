@@ -10,7 +10,9 @@
     <h1>Add Room</h1>
 
     <form action="{% url 'add_room' %}" method="post">
-      {% csrf_token %}
+      {% csrf_token %} {% if error %}
+      <p>{{ error }}</p>
+      {% endif %}
 
       <div class="container">
         <label for="room_number"><b>Room Number</b></label>

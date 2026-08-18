@@ -13,9 +13,6 @@ room_numbers = [
     ('203', '203'),
     ('204', '204'),
 ]
-
-
-
 class Guests(models.Model):
 
 
