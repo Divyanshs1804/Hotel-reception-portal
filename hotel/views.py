@@ -143,7 +143,7 @@ def add_booking(request):
             check_out=check_out_date
         )
 
-        return redirect('/bookings/')
+        return redirect('/booking/')
 
     guests = Guests.objects.all()
     rooms = Room.objects.filter(is_available=True)
